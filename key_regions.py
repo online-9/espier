@@ -13,5 +13,18 @@ def diff_of_gaussian(image):
 		y, x, r = blob
 		c = plt.Circle((x, y), r, color='green', linewidth=2, fill=False)
 		ax.add_patch(c)
-		
-		
+
+def harris(image):
+	corners = corner_peaks(corner_harris(image), min_distance=1)
+	for corner in corners:
+	    y,x=corner[0],corner[1]
+	    c = plt.Circle((x, y), 4, color='green', linewidth=2, fill=False)
+	    ax.add_patch(c)
+
+def interst_regions(image):
+	fig,axes = plt.subplots()
+	ax = axes[0]
+	ax.imshow(image, interpolation='nearest')
+	diff_of_gaussian(image)
+	harris(image)
+	plt.show()	
