@@ -19,7 +19,7 @@ class ScrapeImages(object):
 		
 	def target_url(self,query):
 		return "https://www.google.com/search?as_st=y&tbm=isch&hl=en&as_q=%s&as_epq=&as_oq=&as_eq=&cr=&as_sitesearch=&safe=images&tbs=isz:m" % query
-
+		
 	def scrape(self,query):
 		# Scrape all results returned from current page
 		self.driver.get(self.target_url(query))
