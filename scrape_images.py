@@ -16,7 +16,7 @@ class ScrapeImages(object):
 		self.DOWNLOAD_DIR = os.path.dirname(__file__)
 		self.image_xpath = "//img[@class='rg_i']"
 		self.driver = webdriver.Firefox()
-
+		
 	def target_url(self,query):
 		return "https://www.google.com/search?as_st=y&tbm=isch&hl=en&as_q=%s&as_epq=&as_oq=&as_eq=&cr=&as_sitesearch=&safe=images&tbs=isz:m" % query
 
