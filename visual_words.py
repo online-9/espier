@@ -52,6 +52,7 @@ def dict2numpy(dic):
 if __name__ == '__main__':
 	print("Loading images and extracting sift features")
 
+  path = 'sift_input_data'
 	all_files = get_imgfiles(path)
 	all_features = extractSift(all_files)
 
