@@ -87,3 +87,9 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+# Sift package
+siftDemoV4/
+
+# Scrape queries
+queries.txt
