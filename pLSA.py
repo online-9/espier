@@ -14,7 +14,7 @@ class pLSA(object):
 		L = 0
 		for d in range(len(docs)):                                    
 			for w,ft in docs[d].items():                
-				L += ft * np.log10( sum(p_z * p_dz[d,:] * p_wz[w,:]))
+				L += ft * np.log10( sum(p_z * p_dz[d,:] * p_wz[int(w),:]))
 
 		return L
 
@@ -86,6 +86,6 @@ if __name__ == '__main__':
 	docs = 'dataset/data.txt'
 	vocab = 'dataset/codebook.txt'
 	model = pLSA(docs,vocab)
-	model.train(5)
+	model.train(2)
 
 

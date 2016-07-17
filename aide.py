@@ -5,7 +5,7 @@ import random
 
 class ReadData(object):
 	def __init__(self):
-		return   
+		return
 
 	# Store documents in a list in the form {words:frequencies}
 	def documents(self,datafile):
@@ -19,7 +19,7 @@ class ReadData(object):
 			word_freq = {w.split(':')[0]:float(w.split(':')[1]) for w in words}
 			data.append(word_freq)
 
-		return data
+		return data[:-1]
 
 	# List of all unique words
 	def vocabulary(self,vocab_file):
@@ -27,7 +27,7 @@ class ReadData(object):
 			vocab = words.read()
 		vocab = re.split("\n",vocab)
 
-		return vocab
+		return vocab[:-1]
 
 
 class E_Step(object):
@@ -40,14 +40,14 @@ class E_Step(object):
 		# Intialize to store new prob. values
 		new_p_dz = np.zeros((len(docs),ntopic))
 
-		for d in  range(len(docs)):   
-			items = list(docs[d].items())  
+		for d in range(0,len(docs)):   
+			items = list(docs[d].items())
 			# Shuffle to not keep the same sampling order always
 			random.shuffle(items)
 			for itm in items:
 				[w,ft] = list(itm)
 				# p(z|d,w)
-				p_z_wd = p_z * p_dz[d,:] * p_wz[w,:]
+				p_z_wd = p_z * p_dz[d,:] * p_wz[int(w),:]
 				p_z_wd = p_z_wd/sum(p_z_wd)
 				# n(d,w) * p(z|d,w)
 				new_p_dz[d,:] += ft * p_z_wd
@@ -61,17 +61,17 @@ class E_Step(object):
 	# E-Step to update p(w|z) 
 	def update_p_wz(self,p_wz,p_dz,p_z,docs,ntopic,nword):
 		new_p_dw = np.zeros((nword,ntopic))
-		for d in  range(len(docs)):
+		for d in range(len(docs)):
 			items = list(docs[d].items())
 			random.shuffle(items)
 			for itm in items:
 				[w,ft] = list(itm)
 				# p(z|d,w)
-				p_z_wd = p_z * p_dz[d,:] * p_wz[w,:]
+				p_z_wd = p_z * p_dz[d,:] * p_wz[int(w),:]
 				p_z_wd = p_z_wd/sum(p_z_wd)
 				# sum_d=0^1 [ n(d,w) * p(z|d,w) ]
-				new_p_dw[w,:] += ft * p_z_wd
-		 
+				new_p_dw[int(w),:] += ft * p_z_wd
+
 		row_sum = new_p_dw.sum(axis=0) 
 		new_p_dw = new_p_dw/row_sum[np.newaxis,:]
 
@@ -88,7 +88,7 @@ class E_Step(object):
 			for itm in items:
 				[w,ft] = list(itm)
 				#Calculate p(z|d,w)
-				p_z_wd = p_z * p_dz[d,:] * p_wz[w,:]
+				p_z_wd = p_z * p_dz[d,:] * p_wz[int(w),:]
 				p_z_wd = p_z_wd/sum(p_z_wd)
 				# sum_d sum_w n(d,w) * p(z|d,w)
 				total_count += ft
@@ -111,7 +111,7 @@ class Inference(object):
 			topic = np.where(top_prob_dis == max(top_prob_dis))[0]
 			p_dz[index] = topic
 
-		return p_dz
+		return p_dz[:,0]
 			
 	# list of topic corresponding to the visual word's index
 	def word_vs_topics(self,p_wz):

@@ -16,8 +16,7 @@ HISTOGRAMS_FILE = 'trainingdata.txt'
 
 def get_imgfiles(path):
 	all_files = []
-	all_files.extend([join(path, basename(fname))
-					for fname in glob(path + "/*")
+	all_files.extend([join(path, basename(fname))for fname in glob(path + "/*")
 					if splitext(fname)[-1].lower() in EXTENSIONS])
 	
 	return all_files
@@ -56,7 +55,9 @@ def dict2numpy(dic):
 
 
 def computeHistograms(codebook,descriptors):
+	# assign closest vector from codebook to the descriptor
 	code,dist = vq.vq(descriptors,codebook)
+	# histogram depicting no. of descriptors(translated to codebook words) for each word
 	visual_words_histogram,bin_edges = np.histogram(code,bins=range(codebook.shape[0] + 1),normed=True)
 
 	return visual_words_histogram
@@ -74,7 +75,7 @@ def writeHistogramsToFile(nwords,fnames,all_word_histgrams,features_fname):
 		data_rows = np.vstack((data_rows,histogram))
 	data_rows = data_rows[1:]
 	fmt = ''
-	for i in range(1,nwords+1):
+	for i in range(nwords):
 		fmt = fmt + str(i) + ':%f '
 	np.savetxt(features_fname, data_rows, fmt)
 
