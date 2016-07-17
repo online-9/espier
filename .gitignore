@@ -96,3 +96,6 @@ queries.txt
 
 # Scraped images data
 img-data/
+
+# ranked results
+results/
