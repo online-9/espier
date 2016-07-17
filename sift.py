@@ -11,17 +11,19 @@ from numpy import *
 import pylab
 
 
-def process_image(imagename, resultname):
+def process_image(imagename, resultname,count):
 	""" process an image and save the results in a .key ascii file"""
 	
 	#check if linux or windows 
 	if os.name == "posix":
-		cmmd = "./sift <"+imagename+">"+resultname
+		cmmd = "./sift <"+imagename.split('/',1)[1]+"> "+resultname
 	else:
-		cmmd = "siftWin32 <"+imagename+">"+resultname
+		cmmd = "siftWin32 <"+imagenamesplit('/',1)[1]+">"+resultname
 	
+	if count==0:
+		os.chdir('siftDemoV4')
 	os.system(cmmd)
-	print 'processed', imagename
+	print('processed',imagename)
 	
 def read_features_from_file(filename):
 	""" read feature properties and return in matrix form"""
@@ -32,7 +34,7 @@ def read_features_from_file(filename):
 	num = int(header[0]) #number of features
 	featlength = int(header[1]) #length of the descriptor
 	if featlength != 128: #should be 128
-		raise RuntimeError, 'Keypoint descriptor length invalid (should be 128).' 
+		raise RuntimeError('Keypoint descriptor length invalid (should be 128).' )
 		
 	locs = zeros((num, 4))
 	descriptors = zeros((num, featlength));        
@@ -53,7 +55,7 @@ def read_features_from_file(filename):
 		pos += 128
 	
 		#normalize each input vector to unit length
-		descriptors[point] = descriptors[point] / linalg.norm(descriptors[point])
+		descriptors[point] = descriptors[point]/linalg.norm(descriptors[point])
 		#print(descriptors[point])
 	f.close()
 	
