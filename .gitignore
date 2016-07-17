@@ -93,3 +93,6 @@ siftDemoV4/
 
 # Scrape queries
 queries.txt
+
+# Scraped images data
+img-data/
