@@ -12,7 +12,7 @@ import pylab
 
 
 def process_image(imagename, resultname,count):
-	""" process an image and save the results in a .key ascii file"""
+	""" process an image and save the results in a .sift ascii file"""
 	
 	#check if linux or windows 
 	if os.name == "posix":
@@ -20,8 +20,6 @@ def process_image(imagename, resultname,count):
 	else:
 		cmmd = "siftWin32 <"+imagenamesplit('/',1)[1]+">"+resultname
 	
-	if count==0:
-		os.chdir('siftDemoV4')
 	os.system(cmmd)
 	print('processed',imagename)
 	
@@ -60,14 +58,3 @@ def read_features_from_file(filename):
 	f.close()
 	
 	return locs,descriptors
-
-	
-def plot_features(im,locs):
-	""" show image with features. input: im (image as array), 
-		locs (row, col, scale, orientation of each feature) """
-	
-	pylab.gray()
-	pylab.imshow(im)
-	pylab.plot([p[1] for p in locs],[p[0] for p in locs],'ob')
-	pylab.axis('off')
-	pylab.show()

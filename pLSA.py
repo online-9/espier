@@ -1,6 +1,7 @@
 import collections
 import numpy as np
 from aide import *
+from pickle import dump
 import matplotlib.pyplot as plt 
 import sys , getopt
 
@@ -12,8 +13,8 @@ class pLSA(object):
 
 	def log_likelihood(self,p_wz,p_dz,p_z,docs):
 		L = 0
-		for d in range(len(docs)):                                    
-			for w,ft in docs[d].items():                
+		for d in range(len(docs)):
+			for w,ft in docs[d].items():
 				L += ft * np.log10( sum(p_z * p_dz[d,:] * p_wz[int(w),:]))
 
 		return L
@@ -67,20 +68,10 @@ class pLSA(object):
 			print("Iteration : %s \t likelihood : %s" % (iteration,likelihood_new))
 			likelihood = likelihood_new
 
-		res_prob  = open("words_prob.txt","w")
-		for l in p_wz:
-			res_prob.write("%s\n" % " ".join(str(l)))
-		res_prob.close()
-
 		i = Inference()
 		results = i.word_vs_topics(p_wz)
-		print("Writting results to file results.txt\n")
-		res_topic = open("words_topic.txt","w")
-		for x in results:
-			res_topic.write("%s\n" % " ".join(str(x)))
 
-		res_topic.close()
-
+		dump(results,open("words_topic.p","wb" ))
 
 if __name__ == '__main__':
 	docs = 'dataset/data.txt'

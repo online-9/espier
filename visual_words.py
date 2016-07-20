@@ -1,16 +1,16 @@
 import sift
 import os
-from glob import glob
 import numpy as np
 import scipy.cluster.vq as vq
-from pickle import dump, HIGHEST_PROTOCOL
-from os.path import exists, isdir, basename, join, splitext
+from convert_to_pgm import *
+from glob import glob
+from pickle import dump,HIGHEST_PROTOCOL
+from os.path import exists, isdir,basename,join,splitext
 
 EXTENSIONS = [".pgm"]
-datasetpath = 'dataset/'
 PRE_ALLOCATION_BUFFER = 1000  # for sift
 K_THRESH = 1  #stopping threshold for kmeans
-CODEBOOK_FILE = 'codebook.file'
+CODEBOOK_FILE = 'codebook.txt'
 HISTOGRAMS_FILE = 'trainingdata.txt'
 
 
@@ -21,18 +21,18 @@ def get_imgfiles(path):
 	
 	return all_files
 
-
 def extractSift(input_files):
 	all_features_dict = {}
-	count=0
+	count = 0
 	for i,fname in enumerate(input_files):
-		features_fname = 'sift_output_data/'+fname.split('/')[2].split('.')[0]+'.sift'
-		if exists(features_fname) == False:
-			print("Calculating sift features for ",fname)
-			sift.process_image(fname, features_fname,count)
-			count+=1
+		# path to store resulting sift files
+		features_fname = 'sift_output/'+fname.split('/')[2].split('.')[0]+'.sift'
+		if count == 0:
+			os.chdir('siftDemoV4')
+		print("Calculating sift features for ",fname)
+		sift.process_image(fname,features_fname,count)
+		count+=1
 		locs, descriptors = sift.read_features_from_file(features_fname)
-		print(descriptors.shape)
 		all_features_dict[fname] = descriptors
 	os.chdir('..')
 	return all_features_dict
@@ -71,7 +71,7 @@ def writeHistogramsToFile(nwords,fnames,all_word_histgrams,features_fname):
 			nwords = histogram.shape[0]
 			data_rows = np.zeros(nwords)
 			print('nclusters have been reduced to '+str(nwords))
-		
+		# stack histograms of all images in single training data file
 		data_rows = np.vstack((data_rows,histogram))
 	data_rows = data_rows[1:]
 	fmt = ''
@@ -80,34 +80,39 @@ def writeHistogramsToFile(nwords,fnames,all_word_histgrams,features_fname):
 	np.savetxt(features_fname, data_rows, fmt)
 
 
+# (put the downloaded Sift Folder in current directory)
+def pre_process(path):
+	os.mkdir('siftDemoV4/sift_input')
+	os.mkdir('siftDemoV4/sift_output')
+	# sift takes pgm images
+	convert2pgm(path+'/*','siftDemoV4/sift_input/')
+	# to store codebook and image histograms
+	os.mkdir('dataset')
 
-if __name__ == '__main__':
 
-	path = 'siftDemoV4/sift_input_data'
-	all_files = get_imgfiles(path)
+def run(img_datapath):
+	pre_process(img_datapath)
+	all_files = get_imgfiles('siftDemoV4/sift_input')
 	all_features = extractSift(all_files)
 
 	print("Computing visual words via k-means")
 	all_features_array = dict2numpy(all_features)
 	nfeatures = all_features_array.shape[0]
+	# no. of visual words
 	nclusters = int(np.sqrt(nfeatures))
 	codebook, distortion = vq.kmeans(all_features_array,nclusters,thresh=K_THRESH)
-	
-	with open(datasetpath+CODEBOOK_FILE,'wb') as f:
-		dump(codebook,f,protocol=HIGHEST_PROTOCOL)
 
-	
-	np.savetxt(datasetpath+'codebook.txt',codebook)
+	datasetpath = 'dataset/'
+	np.savetxt(datasetpath+CODEBOOK_FILE,codebook)
 
-
-	print("Compute the visual words histograms for each image")
+	print("Computing the visual words histograms for each image")
 	all_word_histgrams = {}
 	for imagefname in all_features:
 		word_histgram = computeHistograms(codebook, all_features[imagefname])
 		all_word_histgrams[imagefname] = word_histgram
 
-	print("Write the histograms to file to pass it to the svm")
-	writeHistogramsToFile(nclusters,
-						  all_files,
-						  all_word_histgrams,
-						  datasetpath + HISTOGRAMS_FILE)
+	writeHistogramsToFile(nclusters,all_files,all_word_histgrams,datasetpath + HISTOGRAMS_FILE)
+
+if __name__ == '__main__':
+	# path to scraped images folder
+	run('img-data')
