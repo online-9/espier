@@ -89,7 +89,7 @@ class ScrapeImages(object):
 		# just guess jpeg,no file ext in url
 		file_name = foldername+"/"+str(file_no)+".jpeg"
 		try:
-			urllib.urlretrieve(base, file_name)
+			urllib.request.urlretrieve(base, file_name)
 			print('wrote ',file_name)
 		except IOError as e:
 			print('save from image source error',e)
@@ -105,17 +105,19 @@ class ScrapeImages(object):
 			print('no img', file_no)
 			return
 
-		base_clean = base[base.find(','):]
+		base_clean = base[base.find(',')+1:]
 		try:
 			base_filetype = re.findall(r'image/(.*);', base)[0]
 		except IndexError:
 			print('no image extension,try to save from src', file_no)
-			save_img_src(el,file_no,foldername)
+			self.save_img_src(el,file_no,foldername)
 			return
 
 		file_name = foldername+"/"+str(file_no)+"."+ base_filetype
-		with open(os.path.join(self.DOWNLOAD_DIR,file_name), 'w') as f:
-			f.write(base64.decodestring(base_clean))
+		with open(os.path.join(self.DOWNLOAD_DIR,file_name), 'wb') as f:
+			x = base64.b64decode(base_clean)
+			f.write(x)
+			
 
 		print('wrote ',file_name)
 		time.sleep(sleep_time)
