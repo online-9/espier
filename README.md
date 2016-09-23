@@ -6,12 +6,12 @@ The feature vectors used for this are generated through bag of visual words appr
 
 These visual words are then assigned with the most likely topic they belong to using P(w|z)[probability of word's occurrence within a topic]. And the images are assigned with their most likely topic using P(z|d)[probability of topic given the document/image].
 
-----
+
 ## Usage
-1. Scrape images with: 
-```
-python scrape_images.py
-```
+1. Scrape images with:
+        ```
+        python scrape_images.py
+        ```
 2. Create Visual bag of words with:
         ```
         python visual_words.py
